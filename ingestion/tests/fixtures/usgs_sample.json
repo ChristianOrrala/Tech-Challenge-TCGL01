@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1768486000000,
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson",
+    "title": "USGS Earthquakes (test fixture)",
+    "status": 200,
+    "api": "1.14.1",
+    "count": 4
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5.2,
+        "place": "12km SE of Springfield",
+        "time": 1768478400000,
+        "updated": 1768478730000,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000example1",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us7000example1.geojson",
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 419,
+        "net": "us",
+        "code": "7000example1",
+        "ids": ",us7000example1,",
+        "sources": ",us,",
+        "types": ",origin,phase-data,",
+        "nst": 120,
+        "dmin": 0.891,
+        "rms": 0.65,
+        "gap": 24,
+        "magType": "mww",
+        "type": "earthquake",
+        "title": "M 5.2 - 12km SE of Springfield"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4194, 37.7749, 8.2]
+      },
+      "id": "us7000example1"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": null,
+        "place": "5km N of Rivertown",
+        "time": 1768482000000,
+        "updated": null,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000example2",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us7000example2.geojson",
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 0,
+        "net": "us",
+        "code": "7000example2",
+        "ids": ",us7000example2,",
+        "sources": ",us,",
+        "types": ",origin,",
+        "nst": 8,
+        "dmin": 1.4,
+        "rms": 0.4,
+        "gap": 160,
+        "magType": null,
+        "type": "earthquake",
+        "title": "M -- - 5km N of Rivertown"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [140.6503, 36.2048, 35.7]
+      },
+      "id": "us7000example2"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 3.1,
+        "place": "20km W of Lakeview",
+        "time": 1768485600000,
+        "updated": 1768485700000,
+        "type": "earthquake",
+        "title": "M 3.1 - 20km W of Lakeview"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-70.1, 41.2, 12.0]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 4.4,
+        "place": "8km NE of Hillcrest",
+        "updated": 1768485900000,
+        "type": "earthquake",
+        "title": "M 4.4 - 8km NE of Hillcrest"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.25, 34.05, 15.5]
+      },
+      "id": "us7000example4"
+    }
+  ]
+}
