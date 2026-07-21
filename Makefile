@@ -16,7 +16,7 @@ init:
 	terraform -chdir=$(TF_DIR) init -backend-config=envs/demo/backend.hcl
 
 plan:
-	terraform -chdir=$(TF_DIR) plan -var-file=envs/demo/demo.tfvars -out=tfplan
+	terraform -chdir=$(TF_DIR) plan -var-file=envs/demo/demo.tfvars -var "image_tag=$$(git rev-parse --short HEAD)" -out=tfplan
 
 apply:
 	terraform -chdir=$(TF_DIR) apply tfplan
