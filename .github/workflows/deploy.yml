@@ -60,7 +60,7 @@ jobs:
       # as it has to be on a non-Linux dev machine.
       - name: package ingestion lambda
         run: |
-          python -m pip install --quiet "psycopg[binary]" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
+          python -m pip install --quiet "psycopg[binary]" "typing_extensions" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
           cp ingestion/handler.py ingestion/build/handler.py
 
       - uses: hashicorp/setup-terraform@v3

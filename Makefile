@@ -41,6 +41,10 @@ seed:
 # Python 3.12) rather than whatever wheel the local host would resolve -
 # on a non-Linux host, a plain `pip install` would pull win_amd64/macosx
 # wheels and the function would fail to import psycopg at runtime.
+# typing_extensions is vendored explicitly too - pip evaluates dependency
+# markers against the HOST interpreter, so on Python >= 3.13 hosts,
+# psycopg's typing_extensions dependency is silently omitted from the
+# 3.12 target zip.
 package-ingestion:
-	python -m pip install --quiet "psycopg[binary]" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
+	python -m pip install --quiet "psycopg[binary]" "typing_extensions" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
 	cp ingestion/handler.py ingestion/build/handler.py
