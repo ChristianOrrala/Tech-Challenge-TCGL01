@@ -9,7 +9,10 @@ const https = require('https');
 // rejects on a transport error or timeout.
 function get(host, path) {
   return new Promise((resolve, reject) => {
-    const req = https.get({ host, path, timeout: 10000 }, (res) => {
+    // Managed WAF rule sets reject requests without a User-Agent; the canary
+    // identifies itself instead of asking the firewall for an exception.
+    const headers = { 'user-agent': 'tcgl01-heartbeat/1.0 (synthetics)' };
+    const req = https.get({ host, path, headers, timeout: 10000 }, (res) => {
       let body = '';
       res.on('data', (chunk) => {
         body += chunk;
