@@ -71,9 +71,10 @@ flowchart TB
 
 A browser talks to one host: the CloudFront distribution. There is no separate API domain.
 
-1. `GET /` (and any SPA route) resolves to the **spa** origin - a private S3 bucket, reachable only
-   through CloudFront's Origin Access Control. Two `custom_error_response` blocks rewrite both 403 and
-   404 to `/index.html` with a 200, which is what lets client-side routing work; both rewrites have
+1. `GET /` resolves to the **spa** origin - a private S3 bucket, reachable only through CloudFront's
+   Origin Access Control. The SPA has no client-side router - it is a single page - so the two
+   `custom_error_response` blocks that rewrite 403 and 404 to `/index.html` with a 200 exist for
+   S3+OAC key-miss behavior and hard refreshes of that single page, not for routing; both rewrites have
    `error_caching_min_ttl = 0` so a stale rewrite can never mask a real API failure (see
    [ADR 012](adr/012-disable-edge-error-caching.md)).
 2. `GET /api/*` resolves to the **api** origin - the ALB, over plain HTTP (the ALB carries no
@@ -149,7 +150,9 @@ incomplete).
     excludes IAM, plus a narrow inline grant restoring only enough IAM to manage this project's own
     roles and policies, name-prefixed `tcgl01-*`) - and it carries an explicit `Deny` on modifying its
     own role, policies, or trust relationship. Deny always wins over allow, so even a fully compromised
-    CI run cannot widen its own access. See [ADR 010](adr/010-oidc-ci-sha-pinned-images.md).
+    CI run cannot modify its own role or trust policy (deny-self); creating new privileged roles remains
+    possible within the project prefix, and the production evolution is a permissions boundary applied
+    to every role this identity may create. See [ADR 010](adr/010-oidc-ci-sha-pinned-images.md).
 - **No long-lived AWS credentials anywhere.** GitHub Actions authenticates via OIDC
   (`sts:AssumeRoleWithWebIdentity`), trust-scoped to this exact repository and branch.
 - **Encryption at rest** on the database (`storage_encrypted = true`) and **nothing sensitive in

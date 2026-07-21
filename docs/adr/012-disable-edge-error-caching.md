@@ -3,8 +3,10 @@
 ## Context
 
 CloudFront's `custom_error_response` rewrites both 403 and 404 responses to `/index.html` with a 200
-status, which is what lets the React Router SPA handle client-side routes correctly. That rewrite has
-its own cache TTL, separate from the cache behavior applied to ordinary successful responses.
+status. The SPA has no router - these rewrites instead cover S3+OAC key-miss behavior and hard
+refreshes of the single page, so a mistyped or stale path still lands on the app instead of a raw XML
+error. That rewrite has its own cache TTL, separate from the cache behavior applied to ordinary
+successful responses.
 
 ## Options considered
 

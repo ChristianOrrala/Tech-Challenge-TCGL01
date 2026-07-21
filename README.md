@@ -44,6 +44,7 @@ cp infra/envs/demo/backend.hcl.example infra/envs/demo/backend.hcl     # fill in
 cp infra/envs/demo/demo.tfvars.example infra/envs/demo/demo.tfvars    # fill in an alert email
 
 make init
+make package-ingestion
 make plan
 make apply
 ```
@@ -87,8 +88,10 @@ project hit and fixed): `docs/runbook.md`.
   only this CloudFront distribution knows, closing the residual left by the shared CloudFront-managed
   prefix list.
 - IAM least privilege applied unevenly on purpose: the API's task role holds zero permissions (the app
-  never calls an AWS API), while the CI deploy role's own broad grant explicitly denies modifying
-  itself - a privilege-escalation guard, not an oversight.
+  never calls an AWS API), while the CI deploy role's own broad grant explicitly denies modifying its
+  own role or trust policy (deny-self, not an oversight). Creating new privileged roles within the
+  project prefix remains possible; the production evolution is a permissions boundary applied to every
+  role this identity may create.
 - OIDC federation for CI: no long-lived AWS keys in GitHub; the trust policy pins the exact repository
   and branch via id-embedded subject claims.
 - Defense in depth at the edge: an opt-in WAF (managed rule sets plus rate limiting) layered on top of

@@ -32,7 +32,9 @@ an exact, traceable build, and `:latest` stays a convenience tag, never somethin
 depends on. Local `terraform apply` and `make image` remain fully functional - a live technical-review
 deploy has to work from any laptop, in any account, independent of whether CI is reachable - but the
 deploy role additionally denies modifying its own policies or trust relationship, so even a fully
-compromised CI run cannot widen its own access.
+compromised CI run cannot modify its own role or trust policy (deny-self); creating new privileged
+roles remains possible within the project prefix, and the production evolution is a permissions
+boundary applied to every role this identity may create.
 
 ## Revisit when
 

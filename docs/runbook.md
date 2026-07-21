@@ -208,8 +208,9 @@ Target: clean clone to a live URL in under 45 minutes, with only the prerequisit
 **Prerequisites:** AWS credentials for the target account active locally
 (`aws sts get-caller-identity` succeeds); Terraform >= 1.11 (required for S3 native locking via
 `use_lockfile`); Git Bash if on Windows; Docker Desktop, only if using the local `make image` path
-instead of CI; Node 22 and Python 3.12, only if building the SPA or packaging the ingestion Lambda
-locally instead of through CI; `gh` authenticated, only needed for the CI-takeover step.
+instead of CI; Node 22, only if building the SPA locally instead of through CI; Python 3.12, always -
+local `plan`/`apply` reads whatever `make package-ingestion` last vendored into `ingestion/build/`,
+regardless of whether CI also packages it; `gh` authenticated, only needed for the CI-takeover step.
 
 1. Clone the repository.
 2. `make bootstrap STATE_BUCKET=<globally-unique-name>` - creates the state bucket. Not idempotent:
@@ -218,7 +219,9 @@ locally instead of through CI; `gh` authenticated, only needed for the CI-takeov
    the real bucket name. Copy `infra/envs/demo/demo.tfvars.example` to `infra/envs/demo/demo.tfvars`
    (gitignored) and fill in a real alert email; leave or flip `enable_waf` (guidance below).
 4. `make init`.
-5. `make plan` then `make apply`.
+5. `make package-ingestion` - required before `plan`/`apply` even locally: the archive data source reads
+   whatever is already in `ingestion/build/`.
+6. `make plan` then `make apply`.
 
 **The first-image chicken-and-egg.** The ECS task definition names
 `<ecr_repo_url>:<image_tag>`. On a truly fresh account, neither the ECR repository nor any image under
