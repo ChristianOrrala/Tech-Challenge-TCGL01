@@ -12,3 +12,5 @@ dist/
 crash.log
 backend.hcl
 seed-output.json
+ingestion/build/
+ingestion/build.zip

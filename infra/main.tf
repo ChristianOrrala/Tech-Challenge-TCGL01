@@ -31,3 +31,17 @@ module "api" {
   image_tag     = var.image_tag
   desired_count = var.api_desired_count
 }
+
+module "ingestion" {
+  source = "./modules/ingestion"
+
+  name_prefix        = var.project
+  vpc_id             = module.network.vpc_id
+  private_subnet_ids = module.network.private_subnet_ids
+
+  db_sg_id      = module.database.db_sg_id
+  db_secret_arn = module.database.master_user_secret_arn
+  db_host       = module.database.db_endpoint
+  db_port       = module.database.db_port
+  db_name       = module.database.db_name
+}

@@ -1,4 +1,4 @@
-.PHONY: bootstrap init plan apply destroy image seed
+.PHONY: bootstrap init plan apply destroy image seed package-ingestion
 
 TF_DIR := infra
 AWS_REGION ?= us-east-2
@@ -36,3 +36,11 @@ image:
 seed:
 	aws lambda invoke --function-name tcgl01-ingestion --region $(AWS_REGION) seed-output.json
 	cat seed-output.json
+
+# Vendors psycopg[binary] for the Lambda runtime (manylinux2014_x86_64 /
+# Python 3.12) rather than whatever wheel the local host would resolve -
+# on a non-Linux host, a plain `pip install` would pull win_amd64/macosx
+# wheels and the function would fail to import psycopg at runtime.
+package-ingestion:
+	python -m pip install --quiet "psycopg[binary]" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
+	cp ingestion/handler.py ingestion/build/handler.py
