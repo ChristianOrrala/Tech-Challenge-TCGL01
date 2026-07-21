@@ -41,7 +41,12 @@ data "aws_iam_policy_document" "deploy_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.repo}:ref:refs/heads/main"]
+      # GitHub can issue ID-embedded subject claims (owner@id/repo@id); pinning
+      # the numeric ids survives renames and blocks name re-registration attacks.
+      values = [
+        "repo:${var.repo}:ref:refs/heads/main",
+        "repo:ChristianOrrala@8031432/Tech-Challenge-TCGL01@1307194583:ref:refs/heads/main",
+      ]
     }
   }
 }
