@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "latency_p95" {
 
 resource "aws_cloudwatch_metric_alarm" "data_freshness" {
   alarm_name          = "${var.name_prefix}-data-freshness"
-  alarm_description   = "Newest earthquake event in the database is more than 15 minutes old."
+  alarm_description   = "Ingestion freshness heartbeat missing or out of range - the pipeline has stopped publishing."
   comparison_operator = "GreaterThanThreshold"
   threshold           = 900
   evaluation_periods  = 1

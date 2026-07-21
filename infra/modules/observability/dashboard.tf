@@ -69,7 +69,7 @@ locals {
       width  = 6
       height = 6
       properties = {
-        title     = "Data Freshness (seconds)"
+        title     = "Ingestion heartbeat"
         view      = "singleValue"
         sparkline = true
         region    = local.region
