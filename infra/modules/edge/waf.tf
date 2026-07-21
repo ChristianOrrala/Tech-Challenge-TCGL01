@@ -1,4 +1,5 @@
-# Toggleable WAF (var.enable_waf, default true - see infra/variables.tf).
+# Toggleable WAF (var.enable_waf - opt-in, default false at the root; the
+# demo environment enables it).
 # CLOUDFRONT-scope Web ACLs must be created via a us-east-1 provider
 # regardless of where the rest of the stack lives, hence the aws.us_east_1
 # alias. When the toggle is off, count = 0 and this file has zero

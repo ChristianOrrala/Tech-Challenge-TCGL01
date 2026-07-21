@@ -55,7 +55,7 @@ on its own. On Windows, run `make` from Git Bash; the recipes assume a POSIX she
 **CI takeover:** once the apply above has an output, set `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, and
 `ALERT_EMAIL` as repository secrets and `DEPLOY_ENABLED=true` as a repository variable, then trigger
 `deploy.yml`. Full walkthrough, including the first-image resolution and the `enable_waf` toggle
-guidance: `docs/runbook.md#fresh-account-deployment-guide`.
+guidance: [docs/runbook.md - fresh-account deployment guide](docs/runbook.md#fresh-account-deployment-guide).
 
 ## SLOs
 
@@ -101,14 +101,14 @@ Full reasoning for every decision above: `docs/adr/`.
 ## Cost and teardown
 
 Roughly **3-5 USD/day** for the demo configuration (WAF on, `db.t4g.micro` Multi-AZ, 2 Fargate tasks,
-one NAT gateway). Itemized estimate: `docs/runbook.md#cost`.
+one NAT gateway). Itemized estimate: [docs/runbook.md - cost](docs/runbook.md#cost).
 
 ```
 make destroy
 ```
 
 Buckets and the ECR repository are configured to force-delete even when non-empty, so teardown never
-gets stuck - a deliberate demo-only trade-off, detailed in `docs/runbook.md#teardown`.
+gets stuck - a deliberate demo-only trade-off, detailed in [docs/runbook.md - teardown](docs/runbook.md#teardown).
 
 ## Repo layout
 
