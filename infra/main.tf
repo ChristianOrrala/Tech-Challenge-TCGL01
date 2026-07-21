@@ -45,3 +45,22 @@ module "ingestion" {
   db_port       = module.database.db_port
   db_name       = module.database.db_name
 }
+
+module "edge" {
+  source = "./modules/edge"
+
+  # configuration_aliases forces an explicit providers map; once present,
+  # it stops all implicit inheritance for the "aws" local name (not just
+  # the aliased entry), so the default provider has to be re-listed here
+  # too or every non-WAF resource in the module fails to resolve one.
+  providers = {
+    aws           = aws
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  name_prefix      = var.project
+  alb_dns_name     = module.api.alb_dns_name
+  listener_arn     = module.api.listener_arn
+  target_group_arn = module.api.target_group_arn
+  enable_waf       = var.enable_waf
+}

@@ -74,8 +74,19 @@ resource "aws_lb_listener" "http" {
   port              = 80
   protocol          = "HTTP"
 
+  # Default action no longer forwards. The only path to the target group
+  # is the edge module's listener rule (priority 1), which matches on the
+  # secret X-Origin-Verify header CloudFront alone knows - see
+  # modules/edge/main.tf. Anything hitting this ALB directly, without that
+  # header, gets a flat 403 - origin pinning, independent of the
+  # CloudFront-managed-prefix-list SG rule above.
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
   }
 }

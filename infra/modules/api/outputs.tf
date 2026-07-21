@@ -32,3 +32,13 @@ output "api_sg_id" {
   value       = aws_security_group.api.id
   description = "ID of the API service security group."
 }
+
+output "listener_arn" {
+  value       = aws_lb_listener.http.arn
+  description = "ARN of the API load balancer's :80 listener; the edge module attaches its origin-pinning forward rule to this listener."
+}
+
+output "target_group_arn" {
+  value       = aws_lb_target_group.api.arn
+  description = "Full ARN of the API target group; the edge module's origin-pinning listener rule forwards verified traffic here."
+}
