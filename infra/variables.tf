@@ -18,8 +18,8 @@ variable "region" {
 
 variable "enable_waf" {
   type        = bool
-  default     = true
-  description = "Whether to provision the WAF (and its us-east-1 dependencies)."
+  default     = false
+  description = "Deploy the CloudFront-scope WAF WebACL (us-east-1). Opt-in: default keeps the stack entirely in the workload region."
 }
 
 variable "alert_email" {
