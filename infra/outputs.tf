@@ -29,3 +29,8 @@ output "distribution_id" {
   value       = module.edge.distribution_id
   description = "ID of the CloudFront distribution."
 }
+
+output "dashboard_name" {
+  value       = module.observability.dashboard_name
+  description = "Name of the CloudWatch platform dashboard."
+}

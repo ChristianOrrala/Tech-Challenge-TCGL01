@@ -64,3 +64,22 @@ module "edge" {
   target_group_arn = module.api.target_group_arn
   enable_waf       = var.enable_waf
 }
+
+module "observability" {
+  source = "./modules/observability"
+
+  name_prefix = var.project
+  alert_email = var.alert_email
+
+  alb_arn_suffix          = module.api.alb_arn_suffix
+  target_group_arn_suffix = module.api.target_group_arn_suffix
+  cluster_name            = module.api.cluster_name
+  service_name            = module.api.service_name
+  api_desired_count       = var.api_desired_count
+
+  lambda_function_name = module.ingestion.lambda_function_name
+
+  db_identifier = "${var.project}-db"
+
+  cloudfront_domain = module.edge.cloudfront_domain
+}

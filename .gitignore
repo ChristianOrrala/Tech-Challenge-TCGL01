@@ -14,3 +14,4 @@ backend.hcl
 seed-output.json
 ingestion/build/
 ingestion/build.zip
+infra/modules/observability/canary.zip
