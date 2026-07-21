@@ -1,0 +1,3 @@
+alert_email       = "you@example.com"
+enable_waf        = true
+api_desired_count = 2

@@ -2,6 +2,7 @@
 *.tfstate*
 *.tfvars
 !*.tfvars.example
+tfplan
 .env*
 __pycache__/
 .venv/
@@ -10,3 +11,4 @@ dist/
 .DS_Store
 crash.log
 backend.hcl
+seed-output.json
