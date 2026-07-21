@@ -153,6 +153,9 @@ resource "aws_synthetics_canary" "heartbeat" {
 
   tags = {
     Name = "${var.name_prefix}-heartbeat"
+    # The provider does not diff zip contents; a hash tag forces UpdateCanary
+    # (and a code re-upload) whenever the script changes.
+    CodeSha = data.archive_file.canary.output_base64sha256
   }
 
   depends_on = [aws_iam_role_policy.synthetics]
