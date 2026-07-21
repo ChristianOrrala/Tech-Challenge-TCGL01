@@ -17,6 +17,10 @@ name: deploy
 on:
   push:
     branches: [main]
+    # Documentation changes do not deploy infrastructure.
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
   workflow_dispatch:
 
 concurrency:
