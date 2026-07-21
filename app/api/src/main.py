@@ -8,6 +8,7 @@ banner watches for.
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 
 import psycopg
@@ -16,6 +17,8 @@ from fastapi.responses import JSONResponse
 
 from src.db import get_pool
 from src.repo import QuakeRepository
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="tcgl01-api")
 
@@ -26,6 +29,7 @@ def get_repo() -> QuakeRepository:
 
 @app.exception_handler(psycopg.Error)
 def database_error_handler(request, exc: psycopg.Error) -> JSONResponse:
+    logger.exception("database error")
     return JSONResponse(status_code=503, content={"error": "database unavailable"})
 
 

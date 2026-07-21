@@ -258,6 +258,34 @@ def test_freshness_stale_at_1000_seconds(client):
     assert abs(body["age_seconds"] - 1000) <= 2
 
 
+def test_freshness_not_stale_at_boundary_900_seconds(client):
+    now = datetime.now(timezone.utc)
+    last_ingest = now - timedelta(seconds=900)
+    fake = FakeRepo(freshness={"last_ingest": last_ingest, "latest_event": last_ingest})
+    override(fake)
+
+    response = client.get("/api/meta/freshness")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["stale"] is False
+    assert abs(body["age_seconds"] - 900) <= 2
+
+
+def test_freshness_stale_at_boundary_901_seconds(client):
+    now = datetime.now(timezone.utc)
+    last_ingest = now - timedelta(seconds=901)
+    fake = FakeRepo(freshness={"last_ingest": last_ingest, "latest_event": last_ingest})
+    override(fake)
+
+    response = client.get("/api/meta/freshness")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["stale"] is True
+    assert abs(body["age_seconds"] - 901) <= 2
+
+
 def test_freshness_empty_table_returns_nulls_and_stale(client):
     fake = FakeRepo(freshness={"last_ingest": None, "latest_event": None})
     override(fake)
