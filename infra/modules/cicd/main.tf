@@ -130,6 +130,27 @@ data "aws_iam_policy_document" "iam_project_scoped" {
     actions   = ["iam:CreateServiceLinkedRole"]
     resources = ["*"]
   }
+
+  statement {
+    sid    = "DenySelfModification"
+    effect = "Deny"
+
+    # Privilege-escalation guard: the project-prefix grant would otherwise
+    # match this role's own name; deny always wins over allow.
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole",
+      "iam:DeleteRole",
+      "iam:TagRole",
+      "iam:UntagRole",
+    ]
+
+    resources = [aws_iam_role.deploy.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "iam_project_scoped" {
