@@ -11,7 +11,7 @@ deployable into a fresh AWS account from a clean clone.
 
 ## Live demo
 
-<https://d2x4syxdyv4q8c.cloudfront.net>
+<https://dj6w07ewk4m8e.cloudfront.net>
 
 This is a demo environment for review purposes and may be torn down after the evaluation window closes.
 Region `us-east-2`; edge WAF enabled with tested evidence (see `docs/evidence/`).

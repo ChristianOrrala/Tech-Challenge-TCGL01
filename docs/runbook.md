@@ -229,8 +229,19 @@ that tag exists before the first apply - and that first apply is what creates th
 Expect the first apply to finish with the ECS service unable to start any task (0 running,
 `tcgl01-api-tasks-below-desired` alarming - correct behavior for a service with no prior successful
 deployment to roll back to). Resolve it by pushing an image under that exact tag right after: `make
-image` locally, or let the CI takeover below push it. Once a matching image exists, the ECS service
-converges on its own retry; run `terraform apply` again if it needs a nudge.
+image` locally, or let the CI takeover below push it. If the image arrives while that first deployment
+is still retrying, the service converges on its own. But the deployment circuit breaker's patience is
+finite (roughly ten failed task launches at this desired count): leave the gap long enough and the
+service events read `deployment failed: tasks failed to start`, it stops trying (0 running, 0 pending),
+and re-running `terraform apply` will **not** revive it - the task definition is unchanged, so there is
+no diff to act on. Kick it explicitly instead:
+
+```
+aws ecs update-service --cluster tcgl01 --service tcgl01-api --force-new-deployment
+```
+
+Observed for real in a redeploy rehearsal: a ~40-minute gap between the apply and the first image push
+outlasted the breaker; one forced deployment later, the service was steady in under three minutes.
 
 **CI takeover.** Once the first apply has produced a `deploy_role_arn` output, hand deploys to GitHub
 Actions:
