@@ -25,7 +25,7 @@ variable "enable_waf" {
 variable "alert_email" {
   type        = string
   default     = ""
-  description = "Email for alarm notifications; empty string disables the SNS subscription"
+  description = "Email for alarm notifications; empty string disables the SNS subscription."
 }
 
 variable "db_instance_class" {

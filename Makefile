@@ -4,6 +4,8 @@ TF_DIR := infra
 AWS_REGION ?= us-east-2
 STATE_BUCKET ?=
 
+# Windows note: run make from Git Bash so recipes execute under a POSIX shell.
+
 bootstrap:
 	$(if $(STATE_BUCKET),,$(error STATE_BUCKET is required))
 	aws s3api create-bucket --bucket $(STATE_BUCKET) --region $(AWS_REGION) --create-bucket-configuration LocationConstraint=$(AWS_REGION)
