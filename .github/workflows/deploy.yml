@@ -1,0 +1,119 @@
+name: deploy
+
+# CI is the primary image builder (owner decision) - this workflow builds
+# and pushes app/api's image, applies the full stack, and publishes the
+# SPA. `make image` (Makefile) is a break-glass/live-call fallback only,
+# for when this pipeline itself is unavailable.
+#
+# Log hygiene: this is a PUBLIC repo, so every run's logs are public too.
+# AWS_DEPLOY_ROLE_ARN, TF_STATE_BUCKET, and ALERT_EMAIL are repo SECRETS,
+# which GitHub auto-masks wherever they appear in logs; the account id is
+# additionally masked explicitly below via mask-aws-account-id, since an
+# assumed-role ARN would otherwise print it in the clear. Nothing here
+# runs a plain `terraform output` (which would dump every output,
+# including ones only marked sensitive at the root) - only `-raw` against
+# one named, non-sensitive output at a time.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-2
+
+jobs:
+  deploy:
+    # No run attempts (green or red) until the controller flips this repo
+    # variable to "true" at actual deploy time - it holds only "true" or
+    # is unset, never anything sensitive, so a plain repo VARIABLE (not a
+    # secret) is the right gate.
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Exact manylinux vendoring `make package-ingestion` does locally -
+      # deterministic regardless of the runner's own Python build, same
+      # as it has to be on a non-Linux dev machine.
+      - name: package ingestion lambda
+        run: |
+          python -m pip install --quiet "psycopg[binary]" --platform manylinux2014_x86_64 --only-binary=:all: --python-version 3.12 --target ingestion/build --upgrade
+          cp ingestion/handler.py ingestion/build/handler.py
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      # backend.hcl is gitignored - these are its values, supplied here
+      # only, never committed.
+      - name: terraform init
+        env:
+          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+        run: |
+          terraform -chdir=infra init \
+            -backend-config="bucket=$TF_STATE_BUCKET" \
+            -backend-config="key=tcgl01/demo.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="use_lockfile=true"
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr-login
+
+      - name: build and push api image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          docker build \
+            -t "$ECR_REGISTRY/tcgl01-api:latest" \
+            -t "$ECR_REGISTRY/tcgl01-api:${GITHUB_SHA::7}" \
+            app/api
+          docker push "$ECR_REGISTRY/tcgl01-api:latest"
+          docker push "$ECR_REGISTRY/tcgl01-api:${GITHUB_SHA::7}"
+
+      - name: terraform apply
+        env:
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          terraform -chdir=infra apply -auto-approve -input=false \
+            -var "image_tag=${GITHUB_SHA::7}" \
+            -var "enable_waf=true" \
+            -var "alert_email=$ALERT_EMAIL"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: build web
+        working-directory: app/web
+        run: |
+          npm ci
+          npm run build
+
+      - name: sync spa to s3
+        run: |
+          aws s3 sync app/web/dist "s3://$(terraform -chdir=infra output -raw spa_bucket_name)" --delete
+
+      - name: invalidate cloudfront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$(terraform -chdir=infra output -raw distribution_id)" \
+            --paths "/*"

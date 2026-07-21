@@ -13,6 +13,9 @@ output "alb_dns_name" {
 output "ecr_repo_url" {
   value       = module.api.ecr_repo_url
   description = "URL of the ECR repository holding the API container image."
+  # Embeds the account id; the deploy workflow's logs are public, and a
+  # plain `terraform output` dump would otherwise print it in the clear.
+  sensitive = true
 }
 
 output "cloudfront_domain" {
@@ -33,4 +36,10 @@ output "distribution_id" {
 output "dashboard_name" {
   value       = module.observability.dashboard_name
   description = "Name of the CloudWatch platform dashboard."
+}
+
+output "deploy_role_arn" {
+  value       = module.cicd.deploy_role_arn
+  description = "ARN of the IAM role GitHub Actions assumes via OIDC to deploy this stack; set as the repo's AWS_DEPLOY_ROLE_ARN secret."
+  sensitive   = true
 }

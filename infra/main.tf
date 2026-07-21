@@ -83,3 +83,10 @@ module "observability" {
 
   cloudfront_domain = module.edge.cloudfront_domain
 }
+
+module "cicd" {
+  source = "./modules/cicd"
+
+  name_prefix = var.project
+  repo        = "ChristianOrrala/Tech-Challenge-TCGL01"
+}
