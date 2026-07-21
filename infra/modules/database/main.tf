@@ -51,6 +51,13 @@ resource "aws_db_instance" "this" {
   vpc_security_group_ids = [aws_security_group.db.id]
   db_subnet_group_name   = aws_db_subnet_group.this.name
 
+  # Multi-AZ micro instances have been observed to exceed the provider's
+  # default create timeout while still finishing healthy.
+  timeouts {
+    create = "70m"
+    delete = "60m"
+  }
+
   tags = {
     Name = "${var.name_prefix}-db"
   }
