@@ -111,8 +111,9 @@ every one - recovery pages just as visibly as the original alarm.
 ### `tcgl01-availability-fast-burn`
 
 **Meaning:** white-box composite `1 - (ALB 5xx / requests)` dropped below 99% over the trailing hour.
-**First checks:** the platform dashboard's "ALB Requests & 5xx Errors" and "Availability" widgets; ECS
-service events for a recent or in-progress deployment; whether `tcgl01-canary-failing` is also alarming.
+**First checks:** the platform dashboard's "ALB Requests & 5xx (target vs ALB-generated)" and
+"Availability (white-box, 1h)" widgets; ECS service events for a recent or in-progress deployment;
+whether `tcgl01-canary-failing` is also alarming.
 **Likely causes:** a bad deploy (check `tcgl01-api-tasks-below-desired` and ECS events together); a
 database outage or exhausted connection pool (every `/api/*` route turns a `psycopg.Error` into a
 uniform 503 - `docs/resilience.md`); a genuine bug at volume. This alarm is white-box only - if the
