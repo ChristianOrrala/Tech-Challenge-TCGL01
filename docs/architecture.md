@@ -161,6 +161,31 @@ incomplete).
   itself lives in a private, versioned S3 bucket, never in the repository. See
   [ADR 013](adr/013-managed-master-password.md).
 
+## High availability
+
+Availability is built in at each tier, and the points where a one-week demo stops short of full
+fault-tolerance are named rather than implied - the same honesty the failure-mode table in
+`docs/resilience.md` carries, summarized here at the architecture level.
+
+| Tier | What keeps it available | Residual at demo scope |
+|------|-------------------------|------------------------|
+| CloudFront | Global, AWS-managed edge network - no single point of presence to lose | None material |
+| ALB | AWS-managed, spans both public subnets across the 2 AZs; self-heals within the service | None material |
+| ECS API | `desired_count = 2` Fargate tasks, one per private subnet so a single-AZ loss keeps a task serving through the ALB; rolling deploys at `min_healthy = 100%` / `max = 200%` never dip capacity during a release | Two tasks, not an autoscaled fleet - sized for the demo, widens by raising the count |
+| RDS | Multi-AZ: a synchronous standby in the second AZ, automatic failover on instance or AZ loss | Failover is not drilled here - the 1-2 min figure is AWS's documented range, not one this project measured (`docs/slo.md`, RPO/RTO) |
+| Ingestion | EventBridge and Lambda are regional AWS-managed services, inherently multi-AZ; the pipeline is decoupled, so an ingestion outage degrades freshness without touching the read path (`docs/resilience.md`) | Shares the single NAT gateway for egress (below) |
+
+Two deliberate gaps, stated plainly, neither an oversight:
+
+- **One NAT gateway, not one per AZ** - the single place the AZ-loss story is incomplete: if the AZ
+  holding the NAT gateway is the one lost, the surviving-AZ task and the ingestion Lambda both lose
+  internet egress even while otherwise healthy. Named here, in `## Network tiers`, and in
+  `docs/resilience.md`. One NAT per AZ is the production fix, at roughly double the idle NAT cost.
+- **Single region.** A full us-east-2 outage is out of scope - the challenge scopes the build to one
+  region, and multi-region active-passive is the production evolution, not a one-week deliverable. The
+  one recovery behavior actually drilled rather than just configured is the ECS deployment circuit
+  breaker: 24/24 uptime probes across a live rollback, `docs/evidence/deployment-smoke.md`.
+
 ## Region layout
 
 Every regional resource - the VPC, ALB, ECS cluster, RDS instance, Lambda, both S3 buckets, the

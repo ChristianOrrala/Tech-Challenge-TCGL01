@@ -165,7 +165,7 @@ Tech-Challenge-TCGL01/
 ## Docs index
 
 - [`docs/architecture.md`](docs/architecture.md) - overview, diagram, request/ingestion paths, network
-  tiers, security model, region layout
+  tiers, security model, high availability, region layout
 - [`docs/slo.md`](docs/slo.md) - SLIs/SLOs, error budget, burn policy, RPO/RTO, measurement-point
   honesty
 - [`docs/runbook.md`](docs/runbook.md) - deploy, rollback, alarm-by-alarm response, fresh-account
