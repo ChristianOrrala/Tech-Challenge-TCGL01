@@ -34,6 +34,14 @@ Full diagram, request/ingestion paths, network tiers, and the security model: `d
 
 ## Quickstart
 
+The default path is entirely local: your machine deploys straight into your AWS account, no CI and no
+GitHub setup required. This is exactly how a fresh clone (or a live review in someone else's account)
+comes up. Wiring GitHub Actions in is optional and covered afterwards.
+
+Prerequisites: AWS credentials configured for the target account, Terraform >= 1.11, Docker running
+(for the image build), and Python 3.12. On Windows, run `make` from Git Bash - the recipes assume a
+POSIX shell.
+
 ```
 git clone https://github.com/ChristianOrrala/Tech-Challenge-TCGL01.git
 cd Tech-Challenge-TCGL01
@@ -46,17 +54,25 @@ cp infra/envs/demo/demo.tfvars.example infra/envs/demo/demo.tfvars    # fill in 
 make init
 make package-ingestion
 make plan
-make apply
+make apply       # stands up the stack, including an (empty) ECR repository
+make image       # build and push the first API image; ECS converges once it lands
+make seed        # invoke ingestion once so the tables fill without waiting on the schedule
 ```
 
-That first apply creates the ECR repository but cannot start any API task until an image exists under
-the tag it just planned for - push one (`make image`, or hand off to CI below) and the service converges
-on its own. On Windows, run `make` from Git Bash; the recipes assume a POSIX shell.
+`make apply` finishes before any image exists, so the API service will briefly report tasks that cannot
+start - expected on a fresh account. `make image` resolves it and ECS converges on its own. If the wait
+between the two ran long enough that the deployment already gave up, nudge it with
+`aws ecs update-service --cluster tcgl01 --service tcgl01-api --force-new-deployment` (details:
+[docs/runbook.md](docs/runbook.md#fresh-account-deployment-guide)).
 
-**CI takeover:** once the apply above has an output, set `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`, and
-`ALERT_EMAIL` as repository secrets and `DEPLOY_ENABLED=true` as a repository variable, then trigger
-`deploy.yml`. Full walkthrough, including the first-image resolution and the `enable_waf` toggle
-guidance: [docs/runbook.md - fresh-account deployment guide](docs/runbook.md#fresh-account-deployment-guide).
+### Optional: hand ongoing deploys to GitHub Actions
+
+Only useful when you own the repository and want pushes to `main` to deploy for you - not needed to
+stand the stack up. Once the local apply above has run, set `AWS_DEPLOY_ROLE_ARN`, `TF_STATE_BUCKET`,
+and `ALERT_EMAIL` as repository secrets and `DEPLOY_ENABLED=true` as a repository variable, then trigger
+`deploy.yml`. The trust policy is federated via OIDC - no long-lived keys leave your account. Full
+walkthrough, including the `enable_waf` toggle guidance:
+[docs/runbook.md - fresh-account deployment guide](docs/runbook.md#fresh-account-deployment-guide).
 
 ## SLOs
 
