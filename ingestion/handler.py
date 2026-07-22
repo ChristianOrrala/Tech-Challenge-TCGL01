@@ -51,7 +51,13 @@ ON CONFLICT (event_id) DO UPDATE SET
     latitude    = EXCLUDED.latitude,
     longitude   = EXCLUDED.longitude,
     depth_km    = EXCLUDED.depth_km,
-    updated_at  = EXCLUDED.updated_at
+    updated_at  = EXCLUDED.updated_at,
+    -- An update is still a pipeline write. API freshness is
+    -- MAX(ingested_at), so it must advance on every successful cycle,
+    -- not only when the feed publishes a brand-new event id - otherwise
+    -- a quiet quarter-hour of global seismicity reads as an outage and
+    -- fails the canary through the freshness endpoint's 503.
+    ingested_at = now()
 """
 
 
