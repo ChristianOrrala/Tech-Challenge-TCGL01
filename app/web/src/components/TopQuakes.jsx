@@ -1,30 +1,42 @@
-function formatDate(iso) {
-  if (!iso) return '-'
-  return new Date(iso).toISOString().slice(0, 10)
-}
+import Panel, { Skeleton, Unavailable } from './Panel.jsx'
+import { formatFixed1, formatUtcDay, magSeverityClass } from '../format.js'
 
-export default function TopQuakes({ data, error }) {
+export default function TopQuakes({ data, error, fetchedAt }) {
   const items = data?.items ?? []
 
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <h2>Top quakes (30 days)</h2>
-        {error && <span className="chip">unavailable</span>}
-      </div>
-      {items.length === 0 ? (
+    <Panel
+      id="top"
+      title="Strongest quakes"
+      sub="top 5 by magnitude · past 30 days"
+      error={error}
+      hasData={Boolean(data)}
+      fetchedAt={fetchedAt}
+    >
+      {!data && !error ? (
+        <Skeleton label="Loading strongest quakes" rows={5} />
+      ) : !data ? (
+        <Unavailable what="strongest quakes" />
+      ) : items.length === 0 ? (
         <p className="empty-state">No quake data available</p>
       ) : (
         <ol className="top-quakes">
           {items.map((quake) => (
             <li key={quake.id}>
-              <strong>{typeof quake.magnitude === 'number' ? quake.magnitude.toFixed(1) : '-'}</strong>{' '}
-              {quake.place ?? 'Unknown location'}
-              <span className="quake-date">{formatDate(quake.time)}</span>
+              <span className={`quake-mag ${magSeverityClass(quake.magnitude)}`.trim()}>
+                M {formatFixed1(quake.magnitude)}
+              </span>
+              <span className="quake-detail">
+                <span className="quake-place">{quake.place ?? 'Unknown location'}</span>
+                <span className="quake-meta">
+                  {formatUtcDay(quake.time)}
+                  {typeof quake.depth_km === 'number' ? ` · ${formatFixed1(quake.depth_km)} km deep` : ''}
+                </span>
+              </span>
             </li>
           ))}
         </ol>
       )}
-    </section>
+    </Panel>
   )
 }
