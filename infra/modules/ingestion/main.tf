@@ -145,8 +145,11 @@ resource "aws_lambda_function" "ingestion" {
   runtime       = "python3.12"
   handler       = "handler.lambda_handler"
   architectures = ["x86_64"]
-  timeout       = 120
-  memory_size   = 512
+  # 600 s: headroom for the operator-invoked deep seed (ADR-014) - about
+  # 120 month-sized USGS queries plus their upserts in one invocation.
+  # Scheduled 5-minute runs still finish in seconds.
+  timeout     = 600
+  memory_size = 512
 
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256

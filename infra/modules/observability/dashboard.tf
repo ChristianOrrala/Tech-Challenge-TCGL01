@@ -295,9 +295,10 @@ locals {
         background = "transparent"
       }
     },
-    # Duration rides the right axis: drift toward the 120 s function
+    # Duration rides the right axis: drift toward the 600 s function
     # timeout is a documented freshness-alarm cause long before Errors
-    # goes nonzero.
+    # goes nonzero (scheduled runs finish in seconds; the headroom is for
+    # the operator-invoked deep seed).
     {
       type   = "metric"
       x      = 0

@@ -138,8 +138,8 @@ the pipeline, not a live staleness gauge - see `docs/slo.md` for why.
 **First checks:** `tcgl01-ingestion-failures` (the two usually fire together); CloudWatch Logs
 `/aws/lambda/tcgl01-ingestion` for the most recent invocations; whether the EventBridge schedule rule is
 still enabled.
-**Likely causes:** the Lambda crash-looping or timing out (120 s function timeout; each USGS fetch has
-its own 30 s request timeout); the USGS API unreachable or its response shape changed (`transform()`
+**Likely causes:** the Lambda crash-looping or timing out (600 s function timeout - headroom for the
+one-off deep seed, scheduled runs finish in seconds; each USGS fetch has its own 30 s request timeout); the USGS API unreachable or its response shape changed (`transform()`
 defensively drops individual malformed features, but a total fetch failure raises and fails the whole
 run); an IAM or Secrets Manager permission break.
 
@@ -273,6 +273,36 @@ back. The one full apply timed during this project's own build was contaminated 
 sleeping mid-run (the RDS waiter accumulated the sleep time; the instance was confirmed healthy and
 untainted afterward), so that run's wall-clock number is not a valid reference for the 45-minute target
 - a clean-room timing rehearsal (destroy, then a fresh timed apply) is the honest way to get one.
+
+### Deep seed (optional, one-off)
+
+The catalog serves history from our own database only - depth comes from a one-off, operator-invoked
+deep seed of roughly a decade of M >= 4.0 events, never from upstream fetches in the API request path
+(ADR-014). It reuses the ingestion Lambda with an explicit payload; scheduled EventBridge runs carry no
+`mode` key and are unaffected:
+
+```
+aws lambda invoke --function-name tcgl01-ingestion --region us-east-2 \
+  --cli-binary-format raw-in-base64-out --cli-read-timeout 900 \
+  --payload '{"mode": "deep_seed"}' deep-seed-output.json
+```
+
+Optional payload keys, shown with their defaults: `"seed_days": 3650`, `"min_magnitude": 4.0`,
+`"chunk_days": 30`. `--cli-binary-format raw-in-base64-out` is what makes a raw JSON payload work on
+AWS CLI v2, and `--cli-read-timeout 900` keeps the CLI from abandoning (and retrying) the synchronous
+invoke - expect a few minutes of wall clock for ~120 month-sized USGS queries (function timeout 600 s).
+
+The response, written to `deep-seed-output.json`, is
+`{"status": "ok", "mode": "deep_seed", "chunks": 122, "upserted": <n>, "capped_chunks": 0}`: `chunks`
+is how many windows were fetched (122 at the defaults), `upserted` how many rows were written (new
+events plus re-applied revisions), and `capped_chunks` how many windows returned exactly the USGS
+20k-per-query cap and are therefore presumed truncated. `capped_chunks` should be 0; if it is not,
+re-run with a smaller `chunk_days` (say 7). Re-running is always safe, on an empty or already-populated
+table: the upsert is keyed on `event_id`, so the whole operation is idempotent and coexists with the
+scheduled 5-minute runs.
+
+Verify: `GET /api/quakes?limit=1` - `coverage.m4_since` in the response should move back roughly ten
+years from the first-boot backfill date.
 
 ## Teardown
 
