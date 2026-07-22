@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Catalog from './components/Catalog.jsx'
 import FreshnessBanner from './components/FreshnessBanner.jsx'
 import RecentQuakes from './components/RecentQuakes.jsx'
 import WeeklyChart from './components/WeeklyChart.jsx'
@@ -77,16 +78,21 @@ export default function App() {
         </button>
       </header>
       <FreshnessBanner data={freshness.data} error={freshness.error} fetchedAt={freshness.fetchedAt} />
-      <main className="panels">
-        <RecentQuakes data={recent.data} error={recent.error} fetchedAt={recent.fetchedAt} />
-        <WeeklyChart data={weekly.data} error={weekly.error} fetchedAt={weekly.fetchedAt} />
-        <TopQuakes
-          data={top.data}
-          error={top.error}
-          fetchedAt={top.fetchedAt}
-          query={topQuery}
-          onQueryChange={searchTop}
-        />
+      <main>
+        <div className="panels">
+          <RecentQuakes data={recent.data} error={recent.error} fetchedAt={recent.fetchedAt} />
+          <WeeklyChart data={weekly.data} error={weekly.error} fetchedAt={weekly.fetchedAt} />
+          <TopQuakes
+            data={top.data}
+            error={top.error}
+            fetchedAt={top.fetchedAt}
+            query={topQuery}
+            onQueryChange={searchTop}
+          />
+        </div>
+        {/* Browse layer: full width below the grid, fetches on its own -
+            deliberately outside the 60 s poller (see Catalog.jsx). */}
+        <Catalog />
       </main>
     </div>
   )

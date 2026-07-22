@@ -53,6 +53,8 @@ export function Skeleton({ label, rows = 4 }) {
   )
 }
 
-export function Unavailable({ what }) {
-  return <p className="panel-message">{`Could not load ${what} - retrying every 60 s.`}</p>
+// The polled panels retry on the 60 s loop, so that is the default hint;
+// surfaces that fetch on demand (the catalog) pass their own recovery path.
+export function Unavailable({ what, hint = 'retrying every 60 s' }) {
+  return <p className="panel-message">{`Could not load ${what} - ${hint}.`}</p>
 }

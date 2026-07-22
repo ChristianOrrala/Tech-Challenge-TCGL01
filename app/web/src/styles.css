@@ -352,6 +352,104 @@ body {
   font-weight: 600;
 }
 
+/* Earthquake catalog - the full-width browse layer under the panel grid. */
+
+.panel-catalog {
+  margin-top: 16px; /* matches the grid gap so the browse layer keeps its rhythm */
+}
+
+.catalog-scroll {
+  max-height: 560px; /* deeper cap than the at-a-glance table: browsing is the point here */
+}
+
+.catalog-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+/* Native date input on purpose, same reasoning as .inline-select: the
+   picker is the affordance and color-scheme: dark keeps it legible. */
+.date-input {
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out;
+}
+
+.date-input:hover {
+  border-color: var(--border-strong);
+}
+
+/* Sortable headers: a plain button reset so the th keeps the table's type;
+   the active column (the th carrying aria-sort) reads at full text color,
+   so the visual state can never drift from the announced one. */
+.sort-btn {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  transition: color 150ms ease-out;
+}
+
+.sort-btn:hover {
+  color: var(--text);
+}
+
+.data-table th[aria-sort] .sort-btn {
+  color: var(--text);
+}
+
+.sort-arrow {
+  font-size: 0.7rem;
+}
+
+.table-footnote {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.catalog-pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pager-page {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.catalog-retry {
+  margin-top: 10px;
+}
+
 /* Weekly chart */
 
 .chart-box {
@@ -474,9 +572,17 @@ body {
     padding: 12px 18px;
   }
 
-  .inline-select {
+  .inline-select,
+  .date-input {
     padding: 10px 8px;
     font-size: 0.85rem;
+  }
+
+  /* Grow the tap area, not the header row: negative margin claws back
+     exactly what the padding adds. */
+  .sort-btn {
+    padding: 12px 4px;
+    margin: -12px -4px;
   }
 }
 
@@ -486,7 +592,9 @@ body {
   }
 
   .refresh-btn,
-  .inline-select {
+  .inline-select,
+  .date-input,
+  .sort-btn {
     transition: none;
   }
 }

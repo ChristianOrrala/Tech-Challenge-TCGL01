@@ -19,6 +19,14 @@ export function formatUtcShort(iso) {
   return date ? date.toISOString().slice(5, 16).replace('T', ' ') : '-'
 }
 
+// "2016-07-24 04:22" - catalog rows: the catalog is a decade deep, so the
+// year must print; the UTC label lives in the column header, as with
+// formatUtcShort.
+export function formatUtcStamp(iso) {
+  const date = parse(iso)
+  return date ? date.toISOString().slice(0, 16).replace('T', ' ') : '-'
+}
+
 // "2026-07-16" - date-only surfaces (top quakes).
 export function formatUtcDay(iso) {
   const date = parse(iso)
