@@ -74,16 +74,19 @@ body {
   transition: background-color 150ms ease-out, border-color 150ms ease-out;
 }
 
-.refresh-btn:hover:not(:disabled) {
+.refresh-btn:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--surface-raised);
   border-color: var(--border-strong);
 }
 
-.refresh-btn:active:not(:disabled) {
+.refresh-btn:active:not(:disabled):not([aria-disabled='true']) {
   background: var(--bg);
 }
 
-.refresh-btn:disabled {
+/* aria-disabled buttons look and act inert but stay focusable, so a
+   control that turns off under the pointer cannot eject keyboard focus. */
+.refresh-btn:disabled,
+.refresh-btn[aria-disabled='true'] {
   color: var(--text-muted);
   cursor: default;
 }
@@ -121,34 +124,53 @@ body {
   color: var(--text-muted);
 }
 
-/* Layout: Recent quakes is the primary surface and gets its own column;
-   the chart and list stack beside it instead of stretching to its height. */
+/* Layout: Recent quakes gets its own column; the chart and list stack as a
+   second column at their natural height. On desktop Recent matches that
+   column's height and its table scrolls to fill, so the two columns
+   bottom-align with no dead space. */
 
 .panels {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 16px;
-  align-items: start;
+}
+
+/* The chart and list are one stacked unit on every width - the height
+   Recent matches on desktop, and the gap-keeper on mobile where the whole
+   page is a single column. */
+.panel-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 @media (min-width: 760px) {
   .panels {
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    grid-template-areas:
-      'recent weekly'
-      'recent top';
+    align-items: stretch;
   }
 
+  /* The stacked chart+list drive the row height; Recent follows and scrolls
+     inside it. min-height:0 plus an absolutely-positioned scroller keep
+     Recent's own row count out of the grid track sizing, so it is Recent
+     that matches the right column - not the reverse, which would stretch
+     the chart and leave a dead gap under the list. */
   .panel-recent {
-    grid-area: recent;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  .panel-weekly {
-    grid-area: weekly;
+  .recent-fill {
+    position: relative;
+    flex: 1;
+    min-height: 0;
   }
 
-  .panel-top {
-    grid-area: top;
+  .recent-fill .table-scroll {
+    position: absolute;
+    inset: 0;
+    max-height: none;
   }
 }
 
@@ -362,6 +384,26 @@ body {
   max-height: 560px; /* deeper cap than the at-a-glance table: browsing is the point here */
 }
 
+/* Busy: a page/sort/filter fetch dims what it is about to replace. The
+   start delay keeps warm fetches from flickering; the fade is a crossfade,
+   so it deliberately stays on under reduced motion. */
+.catalog-scroll .data-table tbody {
+  transition: opacity 120ms ease-out;
+}
+
+.catalog-scroll[aria-busy='true'] {
+  cursor: progress;
+}
+
+.catalog-scroll[aria-busy='true'] .data-table tbody {
+  opacity: 0.55;
+  transition-delay: 150ms;
+}
+
+.catalog-scroll[aria-busy='true'] ~ .catalog-pager {
+  cursor: progress;
+}
+
 .catalog-controls {
   display: flex;
   flex-wrap: wrap;
@@ -374,6 +416,15 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* From+To as one wrapping unit: the pair may stack internally on narrow
+   screens but other controls can never land between them. */
+.control-range {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
 }
 
 .control-label {
@@ -427,6 +478,16 @@ body {
   font-size: 0.7rem;
 }
 
+/* The resting updown glyph is the sort affordance: without it a sortable
+   header is pixel-identical to a plain one until hovered. */
+.sort-arrow-idle {
+  opacity: 0.7;
+}
+
+.sort-btn:hover .sort-arrow-idle {
+  opacity: 1;
+}
+
 .table-footnote {
   margin: 8px 0 0;
   color: var(--text-muted);
@@ -444,6 +505,11 @@ body {
   color: var(--text-muted);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
+}
+
+.pager-note {
+  color: var(--text-muted);
+  font-size: 0.78rem;
 }
 
 .catalog-retry {
@@ -563,6 +629,18 @@ body {
 
   .app-header {
     flex-wrap: wrap;
+  }
+
+  /* Tighter cells plus a lower Place floor buy back the ~15 px the
+     four-column catalog table (with the always-on sort glyphs) overflows
+     a 375 px viewport by; Depth stops clipping mid-digit. */
+  .data-table th,
+  .data-table td {
+    padding: 6px;
+  }
+
+  .data-table td.cell-place {
+    min-width: 96px;
   }
 }
 

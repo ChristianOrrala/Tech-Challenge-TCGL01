@@ -26,38 +26,40 @@ export default function RecentQuakes({ data, error, fetchedAt }) {
       ) : items.length === 0 ? (
         <p className="empty-state">No quakes above magnitude 4.0 in the last 24 hours</p>
       ) : (
-        <div className="table-scroll" tabIndex={0} role="region" aria-label="Recent quakes, scrollable table">
-          <table className="data-table">
-            <caption className="sr-only">
-              Earthquakes above magnitude 4.0 in the past 24 hours, most recent first
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Time (UTC)</th>
-                <th scope="col" className="num">
-                  Mag
-                </th>
-                <th scope="col">Place</th>
-                <th scope="col" className="num">
-                  Depth (km)
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((quake) => (
-                <tr key={quake.id}>
-                  <td className="cell-time" title={quake.time ?? undefined}>
-                    {formatUtcShort(quake.time)}
-                  </td>
-                  <td className={`num ${magSeverityClass(quake.magnitude)}`.trim()}>
-                    {formatFixed1(quake.magnitude)}
-                  </td>
-                  <td className="cell-place">{quake.place ?? '-'}</td>
-                  <td className="num">{formatFixed1(quake.depth_km)}</td>
+        <div className="recent-fill">
+          <div className="table-scroll" tabIndex={0} role="region" aria-label="Recent quakes, scrollable table">
+            <table className="data-table">
+              <caption className="sr-only">
+                Earthquakes above magnitude 4.0 in the past 24 hours, most recent first
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Time (UTC)</th>
+                  <th scope="col" className="num">
+                    Mag
+                  </th>
+                  <th scope="col">Place</th>
+                  <th scope="col" className="num">
+                    Depth (km)
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map((quake) => (
+                  <tr key={quake.id}>
+                    <td className="cell-time" title={quake.time ?? undefined}>
+                      {formatUtcShort(quake.time)}
+                    </td>
+                    <td className={`num ${magSeverityClass(quake.magnitude)}`.trim()}>
+                      {formatFixed1(quake.magnitude)}
+                    </td>
+                    <td className="cell-place">{quake.place ?? '-'}</td>
+                    <td className="num">{formatFixed1(quake.depth_km)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </Panel>

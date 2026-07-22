@@ -73,7 +73,14 @@ export default function App() {
           <h1>Earthquake Monitor</h1>
           <p className="app-sub">Global seismic activity from the USGS feed · auto-refreshes every 60 s</p>
         </div>
-        <button type="button" className="refresh-btn" onClick={refreshAll} disabled={refreshing}>
+        {/* aria-disabled, not disabled: disabling under the click would
+            eject keyboard focus to the document for the swap's duration. */}
+        <button
+          type="button"
+          className="refresh-btn"
+          onClick={refreshing ? undefined : refreshAll}
+          aria-disabled={refreshing}
+        >
           {refreshing ? 'Refreshing...' : 'Refresh'}
         </button>
       </header>
@@ -81,14 +88,19 @@ export default function App() {
       <main>
         <div className="panels">
           <RecentQuakes data={recent.data} error={recent.error} fetchedAt={recent.fetchedAt} />
-          <WeeklyChart data={weekly.data} error={weekly.error} fetchedAt={weekly.fetchedAt} />
-          <TopQuakes
-            data={top.data}
-            error={top.error}
-            fetchedAt={top.fetchedAt}
-            query={topQuery}
-            onQueryChange={searchTop}
-          />
+          {/* The chart and list are one stacked unit: on desktop Recent
+              matches its combined height, on mobile it just preserves the
+              gap between the two. */}
+          <div className="panel-right-col">
+            <WeeklyChart data={weekly.data} error={weekly.error} fetchedAt={weekly.fetchedAt} />
+            <TopQuakes
+              data={top.data}
+              error={top.error}
+              fetchedAt={top.fetchedAt}
+              query={topQuery}
+              onQueryChange={searchTop}
+            />
+          </div>
         </div>
         {/* Browse layer: full width below the grid, fetches on its own -
             deliberately outside the 60 s poller (see Catalog.jsx). */}
