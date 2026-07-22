@@ -105,6 +105,9 @@ aws ecs update-service --cluster tcgl01 --service tcgl01-api \
 
 ## Alarm-by-alarm response
 
+This section is the first-response mechanics; the practice around it - severity, roles, and the
+blameless postmortem an incident feeds into - is in [docs/incident-response.md](incident-response.md).
+
 All 8 alarms notify the same SNS topic (`tcgl01-alerts`), with `ok_actions` mirroring `alarm_actions` on
 every one - recovery pages just as visibly as the original alarm.
 

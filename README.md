@@ -4,7 +4,8 @@
 
 A cloud-native system that ingests, stores, and serves global earthquake data from the USGS on AWS.
 Built as a Senior/Staff SRE technical challenge, so the infrastructure and the reliability practice
-around it - SLOs, alarms, runbooks, tested failure modes, and thirteen recorded architecture decisions
+around it - SLOs, alarms, runbooks, a blameless incident-response practice, tested failure modes, and
+fourteen recorded architecture decisions
 - are as much the deliverable as the application. Ingestion (EventBridge, Lambda), the API (ECS
 Fargate, RDS PostgreSQL), and the edge (CloudFront, ALB, opt-in WAF) are all defined in Terraform and
 deployable into a fresh AWS account from a clean clone.
@@ -141,7 +142,8 @@ Tech-Challenge-TCGL01/
 │   ├── slo.md
 │   ├── runbook.md
 │   ├── resilience.md
-│   ├── adr/               001-013
+│   ├── incident-response.md
+│   ├── adr/               001-014
 │   └── evidence/          deployment-smoke.md
 ├── infra/
 │   ├── main.tf, variables.tf, outputs.tf, providers.tf, versions.tf
@@ -169,9 +171,11 @@ Tech-Challenge-TCGL01/
 - [`docs/runbook.md`](docs/runbook.md) - deploy, rollback, alarm-by-alarm response, fresh-account
   guide, teardown, cost
 - [`docs/resilience.md`](docs/resilience.md) - failure modes, graceful degradation, toil reduction
+- [`docs/incident-response.md`](docs/incident-response.md) - blameless practice: lifecycle, severity,
+  roles, the postmortem, and a real worked example
 - [`docs/evidence/deployment-smoke.md`](docs/evidence/deployment-smoke.md) - real deployment evidence:
   smoke output, the alarm lifecycle during bring-up, the canary/WAF incident, the rollback drill
-- `docs/adr/` - thirteen architecture decision records:
+- `docs/adr/` - fourteen architecture decision records:
   [001](docs/adr/001-ecs-fargate-over-serverless.md) ECS Fargate over pure serverless ·
   [002](docs/adr/002-rds-postgresql-over-dynamodb.md) RDS PostgreSQL over DynamoDB ·
   [003](docs/adr/003-alb-as-api-front-door.md) ALB as the API front door, no API Gateway ·
@@ -184,4 +188,5 @@ Tech-Challenge-TCGL01/
   [010](docs/adr/010-oidc-ci-sha-pinned-images.md) OIDC CI, sha-pinned images ·
   [011](docs/adr/011-canary-and-alb-metrics-as-slis.md) Canary and ALB metrics as complementary SLIs ·
   [012](docs/adr/012-disable-edge-error-caching.md) Edge error-page caching disabled ·
-  [013](docs/adr/013-managed-master-password.md) Managed master password
+  [013](docs/adr/013-managed-master-password.md) Managed master password ·
+  [014](docs/adr/014-historical-catalog-in-db.md) Historical catalog in-DB, hydration deferred

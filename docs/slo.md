@@ -27,7 +27,8 @@ A 99.9% monthly objective allows 0.1% downtime:
 On budget exhaustion: feature deploys freeze, reliability work takes priority over new work, and normal
 cadence resumes only once the trailing-month budget has recovered. This is a policy statement, not
 something Terraform enforces - there is no automated deploy gate tied to budget consumption today (see
-"Revisit" below).
+"Revisit" below). A breached budget is also a postmortem trigger:
+[docs/incident-response.md](incident-response.md) ties the two together.
 
 ## Fast-burn alarm
 
