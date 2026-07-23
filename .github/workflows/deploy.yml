@@ -100,6 +100,7 @@ jobs:
           terraform -chdir=infra apply -auto-approve -input=false \
             -var "image_tag=${GITHUB_SHA::7}" \
             -var "enable_waf=true" \
+            -var "enable_cicd=true" \
             -var "alert_email=$ALERT_EMAIL"
 
       - uses: actions/setup-node@v4
