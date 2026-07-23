@@ -11,3 +11,4 @@
 enable_waf        = false
 enable_cicd       = true
 api_desired_count = 2
+# Redeploying the API
