@@ -73,7 +73,7 @@ function Invoke-Init {
 
 function Invoke-Plan {
     $sha = Get-GitShortSha
-    Invoke-Checked { terraform "-chdir=$TfDir" plan "-var-file=envs/demo/demo.tfvars" -var "image_tag=$sha" "-out=tfplan" }
+    Invoke-Checked { terraform "-chdir=$TfDir" plan "-var-file=envs/demo/common.tfvars" "-var-file=envs/demo/demo.tfvars" -var "image_tag=$sha" "-out=tfplan" }
 }
 
 function Invoke-Apply {
@@ -81,7 +81,7 @@ function Invoke-Apply {
 }
 
 function Invoke-Destroy {
-    Invoke-Checked { terraform "-chdir=$TfDir" destroy "-var-file=envs/demo/demo.tfvars" }
+    Invoke-Checked { terraform "-chdir=$TfDir" destroy "-var-file=envs/demo/common.tfvars" "-var-file=envs/demo/demo.tfvars" }
 }
 
 function Invoke-Image {

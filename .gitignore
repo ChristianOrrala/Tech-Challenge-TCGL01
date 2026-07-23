@@ -2,6 +2,8 @@
 *.tfstate*
 *.tfvars
 !*.tfvars.example
+# Shared, non-secret demo toggles - committed so local and CI read one source.
+!infra/envs/demo/common.tfvars
 tfplan
 .env*
 __pycache__/

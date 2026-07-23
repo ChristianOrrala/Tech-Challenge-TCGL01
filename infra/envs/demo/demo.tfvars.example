@@ -1,7 +1,8 @@
-alert_email       = "you@example.com"
-# WAF is opt-in (default false); the demo environment enables it.
-enable_waf        = true
-# GitHub Actions OIDC + deploy role: opt-in (default false). Enable it only
-# for the CI/CD takeover path; leave false for local machine-to-AWS deploys.
-enable_cicd       = true
-api_desired_count = 2
+# Copy to demo.tfvars (gitignored). Holds ONLY the secret / per-user value.
+#
+# The shared non-secret toggles (enable_waf, enable_cicd, api_desired_count)
+# live in the committed common.tfvars, which local and CI both read - so this
+# file is intentionally just the one value that must not be committed.
+#
+# Empty string disables the SNS alarm subscription.
+alert_email = "you@example.com"

@@ -16,13 +16,13 @@ init:
 	terraform -chdir=$(TF_DIR) init -backend-config=envs/demo/backend.hcl
 
 plan:
-	terraform -chdir=$(TF_DIR) plan -var-file=envs/demo/demo.tfvars -var "image_tag=$$(git rev-parse --short HEAD)" -out=tfplan
+	terraform -chdir=$(TF_DIR) plan -var-file=envs/demo/common.tfvars -var-file=envs/demo/demo.tfvars -var "image_tag=$$(git rev-parse --short HEAD)" -out=tfplan
 
 apply:
 	terraform -chdir=$(TF_DIR) apply tfplan
 
 destroy:
-	terraform -chdir=$(TF_DIR) destroy -var-file=envs/demo/demo.tfvars
+	terraform -chdir=$(TF_DIR) destroy -var-file=envs/demo/common.tfvars -var-file=envs/demo/demo.tfvars
 
 image:
 	ACCOUNT=$$(aws sts get-caller-identity --query Account --output text) && \
