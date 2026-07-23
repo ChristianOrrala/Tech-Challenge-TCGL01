@@ -22,6 +22,12 @@ variable "enable_waf" {
   description = "Deploy the CloudFront-scope WAF WebACL (us-east-1). Opt-in: default keeps the stack entirely in the workload region."
 }
 
+variable "enable_cicd" {
+  type        = bool
+  default     = false
+  description = "Deploy the GitHub Actions OIDC provider and deploy role (module.cicd). Opt-in: default keeps the stack deployable only from a local machine; enable it for the GitHub Actions takeover path."
+}
+
 variable "alert_email" {
   type        = string
   default     = ""

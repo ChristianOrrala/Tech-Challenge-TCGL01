@@ -39,7 +39,8 @@ output "dashboard_name" {
 }
 
 output "deploy_role_arn" {
-  value       = module.cicd.deploy_role_arn
+  # null when var.enable_cicd is false (module.cicd has count 0).
+  value       = one(module.cicd[*].deploy_role_arn)
   description = "ARN of the IAM role GitHub Actions assumes via OIDC to deploy this stack; set as the repo's AWS_DEPLOY_ROLE_ARN secret."
   sensitive   = true
 }

@@ -1,4 +1,7 @@
 alert_email       = "you@example.com"
 # WAF is opt-in (default false); the demo environment enables it.
 enable_waf        = true
+# GitHub Actions OIDC + deploy role: opt-in (default false). Enable it only
+# for the CI/CD takeover path; leave false for local machine-to-AWS deploys.
+enable_cicd       = true
 api_desired_count = 2

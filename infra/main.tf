@@ -84,7 +84,11 @@ module "observability" {
   cloudfront_domain = module.edge.cloudfront_domain
 }
 
+# CI/CD (GitHub Actions OIDC + deploy role) is opt-in via var.enable_cicd.
+# When off, count = 0 and the whole module drops out of the plan - no OIDC
+# provider, no deploy role, nothing for the local-only deploy path to carry.
 module "cicd" {
+  count  = var.enable_cicd ? 1 : 0
   source = "./modules/cicd"
 
   name_prefix = var.project
